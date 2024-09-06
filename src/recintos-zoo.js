@@ -38,7 +38,7 @@ class RecintosZoo {
     if (!this.animais[animal]) {
       return { erro: "Animal inválido" };
     }
-    if (quantidade <= 0 || !Number.isInteger(quantidade)) {
+    if (quantidade <= 0) {
       return { erro: "Quantidade inválida" };
     }
     return null;
@@ -50,6 +50,25 @@ class RecintosZoo {
     return biomasRecinto.some((compativel) =>
       biomasAnimal.includes(compativel)
     );
+  }
+
+  // Verifica se os animais podem se misturar
+  animaisPodemCoexistir(especieExistente, especieNova) {
+    // Supondo que macacos e gazelas podem coexistir
+    if (
+      (especieExistente === "GAZELA" && especieNova === "MACACO") ||
+      (especieExistente === "MACACO" && especieNova === "GAZELA")
+    ) {
+      return true;
+    }
+    // Evitar coexistência de predadores com presas
+    if (
+      ["LEAO", "LEOPARDO", "CROCODILO"].includes(especieExistente) ||
+      ["LEAO", "LEOPARDO", "CROCODILO"].includes(especieNova)
+    ) {
+      return false;
+    }
+    return true;
   }
 
   analisaRecintos(animal, quantidade) {
@@ -67,12 +86,19 @@ class RecintosZoo {
       }
 
       // verifica se os animais podem coexistir
+      // if (
+      //   recinto.animaisExistentes &&
+      //   ["LEAO", "LEOPARDO", "CROCODILO"].includes(
+      //     recinto.animaisExistentes.especie
+      //   ) &&
+      //   animal !== recinto.animaisExistentes.especie
+      // ) {
+      //   return;
+      // }
+
       if (
         recinto.animaisExistentes &&
-        ["LEAO", "LEOPARDO", "CROCODILO"].includes(
-          recinto.animaisExistentes.especie
-        ) &&
-        animal !== recinto.animaisExistentes.especie
+        !this.animaisPodemCoexistir(recinto.animaisExistentes.especie, animal)
       ) {
         return;
       }
@@ -83,18 +109,11 @@ class RecintosZoo {
           this.animais[recinto.animaisExistentes.especie].tamanho
         : 0;
 
-      if (
-        recinto.animaisExistentes &&
-        recinto.animaisExistentes.especie !== animal
-      ) {
-        espacoOcupado += 1;
-      }
-
       const espacoDisponivel = recinto.tamanho - espacoOcupado;
       const espacoLivre = espacoDisponivel - tamanhoAdequado;
 
       // Corrige o espaço livre
-      if (espacoLivre >= 0) {
+      if (espacoDisponivel >= tamanhoAdequado) {
         recintosDisponveis.push(
           `Recinto ${recinto.numero} (espaço livre: ${espacoLivre} total: ${recinto.tamanho})`
         );
@@ -111,7 +130,7 @@ class RecintosZoo {
 
 export { RecintosZoo as RecintosZoo };
 
-// const zoo = new RecintosZoo();
-// console.log(zoo.analisaRecintos("MACACO", 2));
+const zoo = new RecintosZoo();
+console.log(zoo.analisaRecintos("MACACO", 2));
 // console.log(zoo.analisaRecintos("ELEFANTE", 2));
 // console.log(zoo.analisaRecintos("LEAO", 2));

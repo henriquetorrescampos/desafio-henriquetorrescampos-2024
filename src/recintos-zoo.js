@@ -132,5 +132,5 @@ export { RecintosZoo as RecintosZoo };
 
 const zoo = new RecintosZoo();
 console.log(zoo.analisaRecintos("MACACO", 2));
-// console.log(zoo.analisaRecintos("ELEFANTE", 2));
+console.log(zoo.analisaRecintos("ELEFANTE", 2));
 // console.log(zoo.analisaRecintos("LEAO", 2));

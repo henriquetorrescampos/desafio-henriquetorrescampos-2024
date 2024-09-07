@@ -1,6 +1,6 @@
 class RecintosZoo {
   constructor() {
-    this.recintos = [
+    this.enclosures = [
       {
         numero: 1,
         bioma: "savana",
@@ -23,7 +23,7 @@ class RecintosZoo {
       },
     ];
 
-    this.animais = {
+    this.animals = {
       LEAO: { tamanho: 3, biomas: ["savana"] },
       LEOPARDO: { tamanho: 2, biomas: ["savana"] },
       CROCODILO: { tamanho: 3, biomas: ["rio"] },
@@ -34,100 +34,101 @@ class RecintosZoo {
   }
 
   //method se animal válido
-  isValid(animal, quantidade) {
-    if (!this.animais[animal]) {
+  isValidAnimal(animal, quantity) {
+    if (!this.animals[animal]) {
       return { erro: "Animal inválido" };
     }
-    if (quantidade <= 0) {
+    if (quantity <= 0) {
       return { erro: "Quantidade inválida" };
     }
     return null;
   }
 
   //method bioma compativel
-  biomaCompativel(bioma, biomasAnimal) {
-    const biomasRecinto = bioma.split(" e ");
-    return biomasRecinto.some((compativel) =>
-      biomasAnimal.includes(compativel)
+  isBiomeCompatible(biome, animalBiome) {
+    const enclosureBiomes = biome.split(" e ");
+    return enclosureBiomes.some((compatible) =>
+      animalBiome.includes(compatible)
     );
   }
 
-  // Verifica se os animais podem fazer parte do mesmo bioma
-  animaisPodemCoexistir(especieExistente, especieNova) {
+  // Verifica se os animals podem fazer parte do mesmo bioma
+  animaisPodemCoexistir(existingSpecie, newSpecie) {
     if (
-      (especieExistente === "GAZELA" && especieNova === "MACACO") ||
-      (especieExistente === "MACACO" && especieNova === "GAZELA")
+      (existingSpecie === "GAZELA" && newSpecie === "MACACO") ||
+      (existingSpecie === "MACACO" && newSpecie === "GAZELA")
     ) {
       return true;
     }
     // Carnivores devem ficar com carnívoros
     if (
-      ["LEAO", "LEOPARDO", "CROCODILO"].includes(especieExistente) ||
-      ["LEAO", "LEOPARDO", "CROCODILO"].includes(especieNova)
+      ["LEAO", "LEOPARDO", "CROCODILO"].includes(existingSpecie) ||
+      ["LEAO", "LEOPARDO", "CROCODILO"].includes(newSpecie)
     ) {
       return false;
     }
     return true;
   }
 
-  analisaRecintos(animal, quantidade) {
-    const erro = this.isValid(animal, quantidade);
-    if (erro) return erro;
+  analisaRecintos(animal, quantity) {
+    const error = this.isValidAnimal(animal, quantity);
+    if (error) return error;
 
-    const tamanhoAdequado = this.animais[animal].tamanho * quantidade;
-    let biomasViaveis = this.animais[animal].biomas;
-    let recintosDisponveis = [];
+    const requiredSize = this.animals[animal].tamanho * quantity;
+    let viableBiome = this.animals[animal].biomas;
+    let availableEnclosures = [];
 
-    this.recintos.forEach((recinto) => {
-      // Verifica se o bioma do recinto é compatível com o bioma do animal
-      if (!this.biomaCompativel(recinto.bioma, biomasViaveis)) {
+    this.enclosures.forEach((enclosure) => {
+      // Verifica se o bioma do enclosure é compatível com o bioma do animal
+      if (!this.isBiomeCompatible(enclosure.bioma, viableBiome)) {
         return;
       }
 
       if (
-        recinto.animaisExistentes &&
-        !this.animaisPodemCoexistir(recinto.animaisExistentes.especie, animal)
+        enclosure.animaisExistentes &&
+        !this.animaisPodemCoexistir(enclosure.animaisExistentes.especie, animal)
       ) {
         return;
       }
 
       // espaço ocupado pelos animais existentes
-      // fórmula dos espaço ocupado no recinto
-      let espacoOcupado = recinto.animaisExistentes
-        ? recinto.animaisExistentes.quantidade *
-          this.animais[recinto.animaisExistentes.especie].tamanho
+      // fórmula dos espaço ocupado no enclosure
+      let occupiedSpace = enclosure.animaisExistentes
+        ? enclosure.animaisExistentes.quantidade *
+          this.animals[enclosure.animaisExistentes.especie].tamanho
         : 0;
 
-      // calcula o tamanho atual no recinto - o espaço ocupado pelo animal
-      let espacoDisponivel = recinto.tamanho - espacoOcupado;
-      let espacoLivre = espacoDisponivel - tamanhoAdequado;
+      // calcula o tamanho atual no enclosure - o espaço ocupado pelo animal
+      let availableSpace = enclosure.tamanho - occupiedSpace;
+      let currentFreeSpace = availableSpace - requiredSize;
 
-      // checagem se existe uma especie no recinto e se a nova espécie é diferente
+      // checagem se existe uma especie no enclosure e se a nova espécie é diferente
       if (
-        recinto.animaisExistentes &&
-        recinto.animaisExistentes.especie !== animal
+        enclosure.animaisExistentes &&
+        enclosure.animaisExistentes.especie !== animal
       ) {
-        espacoLivre -= 1;
+        currentFreeSpace -= 1;
       }
 
       // verifica se o recindo é viavel
-      if (espacoDisponivel >= tamanhoAdequado) {
-        recintosDisponveis.push(
-          `Recinto ${recinto.numero} (espaço livre: ${espacoLivre} total: ${recinto.tamanho})`
+      if (availableSpace >= requiredSize) {
+        availableEnclosures.push(
+          `Recinto ${enclosure.numero} (espaço livre: ${currentFreeSpace} total: ${enclosure.tamanho})`
         );
       }
     });
 
-    if (recintosDisponveis.length === 0) {
+    if (availableEnclosures.length === 0) {
       return { erro: "Não há recinto viável" };
     }
 
-    return { recintosViaveis: recintosDisponveis };
+    return { recintosViaveis: availableEnclosures };
   }
 }
 
 export { RecintosZoo as RecintosZoo };
 
+// testar outros testes
 // const zoo = new RecintosZoo();
 // console.log(zoo.analisaRecintos("MACACO", 2));
 // console.log(zoo.analisaRecintos("ELEFANTE", 2));

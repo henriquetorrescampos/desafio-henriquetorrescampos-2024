@@ -75,8 +75,8 @@ class RecintosZoo {
     const erro = this.isValid(animal, quantidade);
     if (erro) return erro;
 
-    const tamanhoAdequado = this.animais[animal].tamanho * quantidade;
-    const biomasViaveis = this.animais[animal].biomas;
+    let tamanhoAdequado = this.animais[animal].tamanho * quantidade;
+    let biomasViaveis = this.animais[animal].biomas;
     let recintosDisponveis = [];
 
     this.recintos.forEach((recinto) => {
@@ -84,17 +84,6 @@ class RecintosZoo {
       if (!this.biomaCompativel(recinto.bioma, biomasViaveis)) {
         return;
       }
-
-      // verifica se os animais podem coexistir
-      // if (
-      //   recinto.animaisExistentes &&
-      //   ["LEAO", "LEOPARDO", "CROCODILO"].includes(
-      //     recinto.animaisExistentes.especie
-      //   ) &&
-      //   animal !== recinto.animaisExistentes.especie
-      // ) {
-      //   return;
-      // }
 
       if (
         recinto.animaisExistentes &&
@@ -109,11 +98,25 @@ class RecintosZoo {
           this.animais[recinto.animaisExistentes.especie].tamanho
         : 0;
 
-      const espacoDisponivel = recinto.tamanho - espacoOcupado;
-      const espacoLivre = espacoDisponivel - tamanhoAdequado;
+      let espacoDisponivel = recinto.tamanho - espacoOcupado;
+      let espacoLivre = espacoDisponivel - tamanhoAdequado;
+
+      if (
+        recinto.animaisExistentes &&
+        recinto.animaisExistentes.especie !== animal
+      ) {
+        espacoLivre -= 1;
+      }
 
       // Corrige o espaço livre
-      if (espacoDisponivel >= tamanhoAdequado) {
+      if (
+        espacoDisponivel >=
+        tamanhoAdequado +
+          (recinto.animaisExistentes &&
+          recinto.animaisExistentes.especie !== animal
+            ? 1
+            : 0)
+      ) {
         recintosDisponveis.push(
           `Recinto ${recinto.numero} (espaço livre: ${espacoLivre} total: ${recinto.tamanho})`
         );
@@ -132,5 +135,5 @@ export { RecintosZoo as RecintosZoo };
 
 const zoo = new RecintosZoo();
 console.log(zoo.analisaRecintos("MACACO", 2));
-console.log(zoo.analisaRecintos("ELEFANTE", 2));
+// console.log(zoo.analisaRecintos("ELEFANTE", 2));
 // console.log(zoo.analisaRecintos("LEAO", 2));

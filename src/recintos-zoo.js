@@ -52,16 +52,15 @@ class RecintosZoo {
     );
   }
 
-  // Verifica se os animais podem se misturar
+  // Verifica se os animais podem fazer parte do mesmo bioma
   animaisPodemCoexistir(especieExistente, especieNova) {
-    // Supondo que macacos e gazelas podem coexistir
     if (
       (especieExistente === "GAZELA" && especieNova === "MACACO") ||
       (especieExistente === "MACACO" && especieNova === "GAZELA")
     ) {
       return true;
     }
-    // Evitar coexistência de predadores com presas
+    // Carnivores devem ficar com carnívoros
     if (
       ["LEAO", "LEOPARDO", "CROCODILO"].includes(especieExistente) ||
       ["LEAO", "LEOPARDO", "CROCODILO"].includes(especieNova)
@@ -75,7 +74,7 @@ class RecintosZoo {
     const erro = this.isValid(animal, quantidade);
     if (erro) return erro;
 
-    let tamanhoAdequado = this.animais[animal].tamanho * quantidade;
+    const tamanhoAdequado = this.animais[animal].tamanho * quantidade;
     let biomasViaveis = this.animais[animal].biomas;
     let recintosDisponveis = [];
 
@@ -93,14 +92,17 @@ class RecintosZoo {
       }
 
       // espaço ocupado pelos animais existentes
+      // fórmula dos espaço ocupado no recinto
       let espacoOcupado = recinto.animaisExistentes
         ? recinto.animaisExistentes.quantidade *
           this.animais[recinto.animaisExistentes.especie].tamanho
         : 0;
 
+      // calcula o tamanho atual no recinto - o espaço ocupado pelo animal
       let espacoDisponivel = recinto.tamanho - espacoOcupado;
       let espacoLivre = espacoDisponivel - tamanhoAdequado;
 
+      // checagem se existe uma especie no recinto e se a nova espécie é diferente
       if (
         recinto.animaisExistentes &&
         recinto.animaisExistentes.especie !== animal
@@ -108,15 +110,8 @@ class RecintosZoo {
         espacoLivre -= 1;
       }
 
-      // Corrige o espaço livre
-      if (
-        espacoDisponivel >=
-        tamanhoAdequado +
-          (recinto.animaisExistentes &&
-          recinto.animaisExistentes.especie !== animal
-            ? 1
-            : 0)
-      ) {
+      // verifica se o recindo é viavel
+      if (espacoDisponivel >= tamanhoAdequado) {
         recintosDisponveis.push(
           `Recinto ${recinto.numero} (espaço livre: ${espacoLivre} total: ${recinto.tamanho})`
         );
@@ -133,7 +128,7 @@ class RecintosZoo {
 
 export { RecintosZoo as RecintosZoo };
 
-const zoo = new RecintosZoo();
-console.log(zoo.analisaRecintos("MACACO", 2));
+// const zoo = new RecintosZoo();
+// console.log(zoo.analisaRecintos("MACACO", 2));
 // console.log(zoo.analisaRecintos("ELEFANTE", 2));
 // console.log(zoo.analisaRecintos("LEAO", 2));

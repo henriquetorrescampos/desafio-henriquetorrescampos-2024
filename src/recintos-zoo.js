@@ -53,7 +53,7 @@ class RecintosZoo {
   }
 
   // Verifica se os animals podem fazer parte do mesmo bioma
-  animaisPodemCoexistir(existingSpecie, newSpecie) {
+  canAnimalBeTogether(existingSpecie, newSpecie) {
     if (
       (existingSpecie === "GAZELA" && newSpecie === "MACACO") ||
       (existingSpecie === "MACACO" && newSpecie === "GAZELA")
@@ -71,11 +71,13 @@ class RecintosZoo {
   }
 
   analisaRecintos(animal, quantity) {
-    const error = this.isValidAnimal(animal, quantity);
+    const animalUpperCase = animal.toUpperCase();
+
+    const error = this.isValidAnimal(animalUpperCase, quantity);
     if (error) return error;
 
-    const requiredSize = this.animals[animal].tamanho * quantity;
-    let viableBiome = this.animals[animal].biomas;
+    const requiredSize = this.animals[animalUpperCase].tamanho * quantity;
+    let viableBiome = this.animals[animalUpperCase].biomas;
     let availableEnclosures = [];
 
     this.enclosures.forEach((enclosure) => {
@@ -86,7 +88,10 @@ class RecintosZoo {
 
       if (
         enclosure.animaisExistentes &&
-        !this.animaisPodemCoexistir(enclosure.animaisExistentes.especie, animal)
+        !this.canAnimalBeTogether(
+          enclosure.animaisExistentes.especie,
+          animalUpperCase
+        )
       ) {
         return;
       }
@@ -105,7 +110,7 @@ class RecintosZoo {
       // checagem se existe uma especie no enclosure e se a nova espécie é diferente
       if (
         enclosure.animaisExistentes &&
-        enclosure.animaisExistentes.especie !== animal
+        enclosure.animaisExistentes.especie !== animalUpperCase
       ) {
         currentFreeSpace -= 1;
       }
@@ -122,6 +127,7 @@ class RecintosZoo {
       return { erro: "Não há recinto viável" };
     }
 
+    console.log(animalUpperCase);
     return { recintosViaveis: availableEnclosures };
   }
 }
@@ -129,7 +135,7 @@ class RecintosZoo {
 export { RecintosZoo as RecintosZoo };
 
 // testar outros testes
-// const zoo = new RecintosZoo();
-// console.log(zoo.analisaRecintos("MACACO", 2));
+const zoo = new RecintosZoo();
+console.log(zoo.analisaRecintos("macaco", 2));
 // console.log(zoo.analisaRecintos("ELEFANTE", 2));
 // console.log(zoo.analisaRecintos("LEAO", 2));

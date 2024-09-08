@@ -97,13 +97,13 @@ class RecintosZoo {
       }
 
       // espaço ocupado pelos animais existentes
-      // fórmula dos espaço ocupado no enclosure
+      // fórmula do espaço ocupado no enclosure/recinto
       let occupiedSpace = enclosure.animaisExistentes
         ? enclosure.animaisExistentes.quantidade *
           this.animals[enclosure.animaisExistentes.especie].tamanho
         : 0;
 
-      // calcula o tamanho atual no enclosure - o espaço ocupado pelo animal
+      // calcula o tamanho atual no enclosure/recinto - o espaço ocupado pelo animal
       let availableSpace = enclosure.tamanho - occupiedSpace;
       let currentFreeSpace = availableSpace - requiredSize;
 
